@@ -1,0 +1,90 @@
+.background-blue{
+    background-image: linear-gradient(to right, #07e8da , #596273 90%);
+    position: absolute;
+    width: 100%;
+    min-height: 100vh;
+    left: 0;
+    top: 0;
+}
+
+.background-pink{
+    background-image: linear-gradient(to right, #f681e6 , #6d166e 90%);
+    position: absolute;
+    width: 100%;
+    min-height: 100vh;
+    left: 0;
+    top: 0;
+}
+
+.card{
+    width: 85%;
+    min-height: 75%;
+    margin: auto;
+    margin-top: 0.1em;
+    background-color: #444f53;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    color: white;
+    justify-content: center;
+    text-align: center;
+    font-size: 4.2rem;
+    padding: 0.2em 0 0.2em 0;
+}
+
+.card-table{
+    width: 85%;
+    min-height: 75%;
+    margin: auto;
+    margin-top: 0.1em;
+    background-color: #444f53;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    color: white;
+    justify-content: center;
+    text-align: center;
+    font-size: 1rem;
+    padding: 0.2em 0 0.2em 0;
+}
+
+.card-countdown-text{
+    border-style: solid;
+    border-width: 1px;
+    border-color: white;
+    font-size: 0.3em;
+    display: table;
+    margin:auto;
+}
+
+td,
+th,
+tr,
+table {
+    border-bottom: 1px solid white;
+    border-collapse: collapse;
+    margin: auto;
+    margin-top: 2rem;
+    margin-bottom: 5rem;
+    text-align: left;
+}
+
+td.mission,
+th.mission {
+    width: 30%;
+    max-width: 30%;
+}
+
+td.date,
+th.date {
+    width: 20%;
+    max-width: 20%;
+}
+
+td.launchpad,
+th.launchpad {
+    width:20%;
+    max-width: 20%;
+}
+
+td.bookmark,
+th.bookmark {
+    width:10%;
+    max-width: 10%;
+}
