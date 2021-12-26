@@ -60,9 +60,21 @@ const Countdown = () => {
             const urlUpcomingLaunch = process.env.REACT_APP_API_URL + "/launches/next"
             const result = await fetch(urlUpcomingLaunch).then(res => res.json())
             const mission = result?result.name:""
-            const launchDate = result?new Date(result.date_local):new Date()
+            let launchDate = result?new Date(result.date_local):new Date()
             const actualDate = new Date()
-            const timems = launchDate.getTime()- actualDate.getTime()
+            let timems = launchDate.getTime()- actualDate.getTime()
+            if (timems < 0 ){
+                const urlNextLaunches = process.env.REACT_APP_API_URL + "/launches/upcoming"
+                const launches = await fetch(urlNextLaunches).then(res => res.json())
+                launches.every(launch => {
+                    launchDate = new Date(launch.date_utc)
+                    timems = launchDate.getTime()- actualDate.getTime()
+                    if (timems>0){
+                        return false
+                    }
+                    return true
+                });
+            }
             const objectTime = convertTime(timems)
             setObjectTime(objectTime)
             setMission(mission)
