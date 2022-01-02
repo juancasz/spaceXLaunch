@@ -70,6 +70,7 @@ const Countdown = () => {
                     launchDate = new Date(launch.date_utc)
                     timems = launchDate.getTime()- actualDate.getTime()
                     if (timems>0){
+                        setMission(launch.name)
                         return false
                     }
                     return true
