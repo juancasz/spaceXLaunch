@@ -52,33 +52,42 @@ const Countdown = () => {
     //name of the following mission
     const[mission,setMission] = useState("")
 
+    //launch upcoming or launch has already happened
+    const[launchHappened,setLaunchHappened] = useState(false)
+
     //fetching failed
     const[error,setError] = useState(undefined)
 
     const fetchData = async () => {
         try{
             const urlUpcomingLaunch = process.env.REACT_APP_API_URL + "/launches/next"
-            const result = await fetch(urlUpcomingLaunch).then(res => res.json())
-            const mission = result?result.name:""
-            let launchDate = result?new Date(result.date_local):new Date()
-            const actualDate = new Date()
-            let timems = launchDate.getTime()- actualDate.getTime()
-            if (timems < 0 ){
+            const nextLaunch = await fetch(urlUpcomingLaunch).then(res => res.json())
+            const nextLaunchDate = nextLaunch?new Date(nextLaunch.date_local):new Date()
+            const nextLaunchTimems = nextLaunchDate.getTime()- new Date().getTime()
+            if (nextLaunchTimems < 0 ){
                 const urlNextLaunches = process.env.REACT_APP_API_URL + "/launches/upcoming"
                 const launches = await fetch(urlNextLaunches).then(res => res.json())
-                launches.every(launch => {
-                    launchDate = new Date(launch.date_utc)
-                    timems = launchDate.getTime()- actualDate.getTime()
-                    if (timems>0){
-                        setMission(launch.name)
-                        return false
-                    }
-                    return true
+                const recentListLaunch = launches.reduce(function (r, a) {
+                    return new Date(r.date_utc) > new Date(a.date_utc) ? r : a;
                 });
+                const recentListLaunchTimems = new Date(recentListLaunch.date_utc).getTime()- new Date().getTime()
+                if (recentListLaunchTimems>0){
+                    const objectTime = convertTime(recentListLaunchTimems)
+                    setObjectTime(objectTime)
+                    setMission(recentListLaunch.name)
+                    return
+                }else {
+                    const mostRecentLaunchTimems = Math.abs(recentListLaunchTimems)>Math.abs(nextLaunchTimems)?nextLaunchTimems:recentListLaunchTimems
+                    const objectTime = convertTime(Math.abs(mostRecentLaunchTimems))
+                    setObjectTime(objectTime)
+                    setMission(mostRecentLaunchTimems===recentListLaunchTimems?recentListLaunch.name:nextLaunch.name)
+                    setLaunchHappened(true)
+                    return
+                }
             }
-            const objectTime = convertTime(timems)
+            const objectTime = convertTime(nextLaunchTimems)
             setObjectTime(objectTime)
-            setMission(mission)
+            setMission(nextLaunch?nextLaunch.name:"")
         }catch(e){
             setError(e.message)
         }
@@ -94,7 +103,7 @@ const Countdown = () => {
     },[objectTime])
 
     useInterval(() => {
-        if(objectTime){
+        if(objectTime && !launchHappened){
             const newObjectTime = {...objectTime,
                 seconds: objectTime.seconds === 0? 59: objectTime.seconds-1,
                 minutes: objectTime.seconds === 0? 
@@ -107,6 +116,21 @@ const Countdown = () => {
                             objectTime.hours,
                 days: (objectTime.hours === 0 && objectTime.minutes === 0) && objectTime.seconds === 0?
                             objectTime.days -1: objectTime.days
+            }
+            setObjectTime(newObjectTime)
+        }else if (objectTime && launchHappened){
+            const newObjectTime = {...objectTime,
+                seconds: objectTime.seconds === 59? 0: objectTime.seconds+1,
+                minutes: objectTime.seconds === 59? 
+                            objectTime.minutes === 59?
+                                0:objectTime.minutes+1:
+                            objectTime.minutes,
+                hours: objectTime.minutes === 59 && objectTime.seconds === 59?
+                            objectTime.hours === 23?
+                                0:objectTime.hours+1:
+                            objectTime.hours,
+                days: (objectTime.hours === 23 && objectTime.minutes === 59) && objectTime.seconds === 59?
+                            objectTime.days+1: objectTime.days
             }
             setObjectTime(newObjectTime)
         }
@@ -125,7 +149,14 @@ const Countdown = () => {
 
     return(
         <div className='background-blue'>
-            <h2 style={{textAlign:'center',color:'white'}}>Upcoming: {mission}</h2>
+            {
+                launchHappened?
+                <>
+                    <h2 style={{textAlign:'center',color:'white'}}>Last launch: {mission} </h2>
+                    <h2 style={{textAlign:'center',color:'white'}}>Time since then:</h2>
+                </>:
+                <h2 style={{textAlign:'center',color:'white'}}>Upcoming: {mission}</h2>
+            }
             <div className='card'>
                 {objectTime?objectTime.days:0}
                 <div className='card-countdown-text'>
